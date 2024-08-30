@@ -1,113 +1,198 @@
-import Image from "next/image";
+'use client'
+
+import Template from "@/components/task";
+import { decodeAction } from "next/dist/server/app-render/entry-base";
+import { createRef, useState } from "react";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+
+import clsx from 'clsx';
 
 export default function Home() {
+  const [ dropdownOpen, setDropdownOpen ] = useState<boolean>(false);
+  const [ tasks, setTasks ] = useState([
+    {
+      name: 'Design Landing Page',
+      skills: ['HTML', 'CSS', 'JavaScript'],
+      time: '4 hours',
+      deadline: '2024-09-05',
+      wage: 40,
+      active: true,
+      eligible: false
+    },
+    {
+      name: 'Backend API Integration',
+      skills: ['Node.js', 'Express', 'MongoDB', 'REST'],
+      time: '6 hours',
+      deadline: '2024-09-07',
+      wage: 50,
+      active: false,
+      eligible: false
+    },
+    {
+      name: 'Database Optimization',
+      skills: ['SQL'],
+      time: '3 hours',
+      deadline: '2024-09-06',
+      wage: 35,
+      active: false,
+      eligible: true
+    },
+    {
+      name: 'Mobile App Debugging',
+      skills: ['React Native', 'Redux', 'Debugging'],
+      time: '5 hours',
+      deadline: '2024-09-08',
+      wage: 45,
+      active: true,
+      eligible: false
+    },
+    {
+      name: 'SEO Optimization',
+      skills: ['SEO', 'Content Writing'],
+      time: '2 hours',
+      deadline: '2024-09-09',
+      wage: 30,
+      active: false,
+      eligible: false
+    },
+    {
+      name: 'Cloud Infrastructure Setup',
+      skills: ['AWS', 'Docker', 'Kubernetes', 'Terraform', 'CI/CD'],
+      time: '8 hours',
+      deadline: '2024-09-10',
+      wage: 60,
+      active: false,
+      eligible: true
+    },
+    {
+      name: 'UI/UX Review',
+      skills: ['Sketch', 'User Testing'],
+      time: '3 hours',
+      deadline: '2024-09-11',
+      wage: 38,
+      active: false,
+      eligible: false
+    },
+    {
+      name: 'Code Refactoring',
+      skills: ['JavaScript', 'Best Practices'],
+      time: '4 hours',
+      deadline: '2024-09-12',
+      wage: 42,
+      active: true,
+      eligible: false
+    },
+    {
+      name: 'Security Audit',
+      skills: ['Penetration Testing', 'Encryption'],
+      time: '7 hours',
+      deadline: '2024-09-13',
+      wage: 55,
+      active: false,
+      eligible: true
+    },
+    {
+      name: 'Content Creation',
+      skills: ['Writing'],
+      time: '3 hours',
+      deadline: '2024-09-14',
+      wage: 28,
+      active: false,
+      eligible: false
+    }
+  ]);
+
+  const { 
+    register,
+    unregister,
+    reset,
+    handleSubmit,
+    formState: {
+      errors
+    }
+  } = useForm<FieldValues>({
+    defaultValues: {}
+  })
+
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    try {
+      //@ts-ignore
+
+      console.log(data)
+
+      setTasks([...tasks, {
+        name: data.name,
+        time: data.time,
+        deadline: data.deadline,
+        skills: data.skills.split(','),
+        wage: parseInt(data.wage),
+        active: data.active,
+        eligible: data.eligible
+      }])
+    }catch(err) {
+      throw new Error();
+    }
+  }
+
+  const ref = createRef<HTMLFormElement>();
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+    <div>
+
+      <div className="flex justify-between items-center p-6 sm:p-8 lg:p-10">
+        <h1 className="text-yellow-400 text-4xl sm:text-5xl lg:text-6xl font-extrabold">Tasks</h1>
+        
+        <div className="relative">
+          <button onClick={() => {setDropdownOpen(!dropdownOpen)}} className="w-12 h-12 bg-yellow-400 text-gray-800 rounded-full flex items-center justify-center shadow-lg focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 448 512" stroke="currentColor"><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z"/></svg>
+          </button>
+
+          {dropdownOpen && (
+            <div className="p-20 absolute bg-white right-0 mt-2 w-48 rounded-lg shadow-lg overflow-hidden z-20">
+            
+            </div>
+          )}
+        </div>    
       </div>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div className="p-8 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {tasks.map(i => <Template name={i.name} skills={i.skills} time={i.time} deadline={i.deadline} wage={i.wage} active={i.active} eligible={i.eligible}></Template>)}
       </div>
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <div className="p-8">
+        <form ref={ref} onSubmit={handleSubmit(onSubmit)}>
+          <input placeholder="Name" type='text' id='name' {...register('name')}
+            className={clsx(`w-full mb-2 rounded-lg border-[1.5px] border-stroke bg-white px-5 py-3 text-black outline-none transition`,
+                errors['name']
+            )} />
+          <input placeholder="Time" type='text' id='time' {...register('time')}
+          className={clsx(`w-full mb-2 rounded-lg border-[1.5px] border-stroke bg-white px-5 py-3 text-black outline-none transition `,
+              errors['time']
+          )} />
+          <input placeholder="Deadline" type='text' id='deadline' {...register('deadline')}
+          className={clsx(`w-full mb-2 rounded-lg border-[1.5px] border-stroke bg-white px-5 py-3 text-black outline-none transition `,
+              errors['deadline']
+          )} />
+          <input placeholder="Skills (separated by ',')" type='text' id='skills' {...register('skills')}
+          className={clsx(`w-full mb-2 rounded-lg border-[1.5px] border-stroke bg-white px-5 py-3 text-black outline-none transition `,
+              errors['skills']
+          )} />
+          <input placeholder="Wage" type='number' id='wage' {...register('wage')}
+          className={clsx(`w-full rounded-lg border-[1.5px] border-stroke bg-white px-5 py-3 text-black outline-none transition `,
+              errors['wage']
+          )} />
+          <div className="flex">
+            <input type='checkbox' id='active' {...register('active')}/>
+            <span className="text-white text-l">Active</span>
+          </div>
+          <div className="flex">
+            <input type='checkbox' id='eligible' {...register('eligible')}/>
+            <span className="text-white text-l">Eligible</span>
+          </div>
+          <button className="w-full mt-2 p-4 bg-white text-center text-xl">Add</button>
+        </form>
       </div>
-    </main>
+    </div>
+    
   );
 }
