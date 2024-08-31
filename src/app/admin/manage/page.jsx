@@ -1,15 +1,15 @@
 'use client'
 
 import Template from "@/components/task";
-import { decodeAction } from "next/dist/server/app-render/entry-base";
 import { createRef, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
-import clsx from 'clsx';
+import Input from "@/components/form/Input";
+import Tags from "@/components/form/Tags";
 
 export default function Home() {
-  const [ dropdownOpen, setDropdownOpen ] = useState<boolean>(false);
-  const [ tasks, setTasks ] = useState([
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [tasks, setTasks] = useState([
     {
       name: 'Design Landing Page',
       skills: ['HTML', 'CSS', 'JavaScript'],
@@ -110,14 +110,12 @@ export default function Home() {
     formState: {
       errors
     }
-  } = useForm<FieldValues>({
+  } = useForm({
     defaultValues: {}
   })
 
-  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+  const onSubmit = async (data) => {
     try {
-      //@ts-ignore
-
       console.log(data)
 
       setTasks([...tasks, {
@@ -129,70 +127,53 @@ export default function Home() {
         active: data.active,
         eligible: data.eligible
       }])
-    }catch(err) {
+    } catch (err) {
       throw new Error();
     }
   }
 
-  const ref = createRef<HTMLFormElement>();
+  const ref = createRef();
 
   return (
-    <div>
+    <div className="relative">
 
       <div className="flex justify-between items-center p-6 sm:p-8 lg:p-10">
         <h1 className="text-yellow-400 text-4xl sm:text-5xl lg:text-6xl font-extrabold">Tasks</h1>
-        
+
         <div className="relative">
-          <button onClick={() => {setDropdownOpen(!dropdownOpen)}} className="w-12 h-12 bg-yellow-400 text-gray-800 rounded-full flex items-center justify-center shadow-lg focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 448 512" stroke="currentColor"><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z"/></svg>
-          </button>
+          <div className="flex">
+            <button className="w-12 h-12 mr-3 bg-yellow-400 text-gray-800 rounded-full flex items-center justify-center shadow-lg focus:outline-none">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 448 512" stroke="currentColor"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg>
+            </button>
+            <button onClick={() => { setDropdownOpen(!dropdownOpen) }} className="w-12 h-12 bg-yellow-400 text-gray-800 rounded-full flex items-center justify-center shadow-lg focus:outline-none">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 448 512" stroke="currentColor"><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z"/></svg>
+            </button>
+          </div>
 
           {dropdownOpen && (
-            <div className="p-20 absolute bg-white right-0 mt-2 w-48 rounded-lg shadow-lg overflow-hidden z-20">
-            
-            </div>
+            <div className="p-20 absolute bg-white right-0 mt-2 w-48 rounded-lg shadow-lg overflow-hidden z-20"></div>
           )}
-        </div>    
+        </div>
       </div>
 
       <div className="p-8 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {tasks.map(i => <Template name={i.name} skills={i.skills} time={i.time} deadline={i.deadline} wage={i.wage} active={i.active} eligible={i.eligible}></Template>)}
+        {tasks.map(i => <Template key={i.name} name={i.name} skills={i.skills} time={i.time} deadline={i.deadline} wage={i.wage} active={i.active} eligible={i.eligible} />)}
       </div>
 
       <div className="p-8">
+
         <form ref={ref} onSubmit={handleSubmit(onSubmit)}>
-          <input placeholder="Name" type='text' id='name' {...register('name')}
-            className={clsx(`w-full mb-2 rounded-lg border-[1.5px] border-stroke bg-white px-5 py-3 text-black outline-none transition`,
-                errors['name']
-            )} />
-          <input placeholder="Time" type='text' id='time' {...register('time')}
-          className={clsx(`w-full mb-2 rounded-lg border-[1.5px] border-stroke bg-white px-5 py-3 text-black outline-none transition `,
-              errors['time']
-          )} />
-          <input placeholder="Deadline" type='text' id='deadline' {...register('deadline')}
-          className={clsx(`w-full mb-2 rounded-lg border-[1.5px] border-stroke bg-white px-5 py-3 text-black outline-none transition `,
-              errors['deadline']
-          )} />
-          <input placeholder="Skills (separated by ',')" type='text' id='skills' {...register('skills')}
-          className={clsx(`w-full mb-2 rounded-lg border-[1.5px] border-stroke bg-white px-5 py-3 text-black outline-none transition `,
-              errors['skills']
-          )} />
-          <input placeholder="Wage" type='number' id='wage' {...register('wage')}
-          className={clsx(`w-full rounded-lg border-[1.5px] border-stroke bg-white px-5 py-3 text-black outline-none transition `,
-              errors['wage']
-          )} />
-          <div className="flex">
-            <input type='checkbox' id='active' {...register('active')}/>
-            <span className="text-white text-l">Active</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <Input register={register} id='name' label='Name' type='text' errors={errors} showLabel={true} />
+            <Input register={register} id='time' label='Time' type='text' errors={errors} showLabel={true} />
+            <Input register={register} id='deadline' label='Deadline' type='date' errors={errors} showLabel={true} />
+            <Input register={register} id='wage' label='Wage' type='number' errors={errors} showLabel={true} />
           </div>
-          <div className="flex">
-            <input type='checkbox' id='eligible' {...register('eligible')}/>
-            <span className="text-white text-l">Eligible</span>
-          </div>
+          <label className="block text-sm font-medium leading-6 text-white mt-2">Skills</label>
+          <Tags initialTags={['hello', 'guys']} id='he' />
           <button className="w-full mt-2 p-4 bg-white text-center text-xl">Add</button>
         </form>
       </div>
     </div>
-    
   );
 }
